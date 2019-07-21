@@ -1,5 +1,7 @@
 package producer;
 
+import common.validate.Validator;
+import common.validate.WordValidator;
 import common.vo.Message;
 import manager.MessageCluster;
 
@@ -15,13 +17,11 @@ import java.io.IOException;
 public class WordProducer extends Thread {
     private static final String REG_EXP = "^[a-zA-Z0-9]+$";
     private static final String DIR_SEPARATOR = "/";
-    private String filePath;
     private String fileName;
     private MessageCluster cluster;
 
-    public WordProducer(MessageCluster cluster, String filePath, String fileName) {
+    public WordProducer(MessageCluster cluster, String fileName) {
         this.cluster = cluster;
-        this.filePath = filePath;
         this.fileName = fileName;
     }
 
@@ -32,12 +32,12 @@ public class WordProducer extends Thread {
 
     private void produce() {
         // filePath, fileName이 null일때의 처리
-        File inputFile = new File(getAbsoluteFileName(filePath, fileName));
+        File inputFile = new File(getAbsoluteFileName(fileName));
 
         try {
             FileReader fileReader = new FileReader(inputFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            WordValidator validator = new WordValidator(REG_EXP);
+            Validator validator = new WordValidator(REG_EXP);
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -53,8 +53,9 @@ public class WordProducer extends Thread {
         }
     }
 
-    private String getAbsoluteFileName(String filePath, String fileName) {
-        return filePath + DIR_SEPARATOR + fileName;
+    private String getAbsoluteFileName(String fileName) {
+        String currentDir = ".";
+        return currentDir + DIR_SEPARATOR + fileName;
     }
 
     private void send(Message message) {

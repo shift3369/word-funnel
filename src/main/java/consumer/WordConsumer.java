@@ -1,7 +1,7 @@
 package consumer;
 
-import common.FileSyncWriter;
-import common.vo.FileData;
+import common.file.FileSyncWriter;
+import common.file.FileData;
 import common.vo.Message;
 import manager.MessageCluster;
 
@@ -13,18 +13,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @since 20/07/2019.
  */
 public class WordConsumer extends Thread {
-    private static final String DIR_SEPARATOR = "/";
     private static final String NUMBER_FILE_NAME = "number";
-    private static final String TXT_EXTENSION = ".txt";
     private MessageCluster cluster;
     private FileSyncWriter fileSyncWriter;
     private int partitionIndex;
-    private String filePath;
 
-    public WordConsumer(MessageCluster cluster, FileSyncWriter fileSyncWriter, String filePath, int partitionIndex) {
+    public WordConsumer(MessageCluster cluster, FileSyncWriter fileSyncWriter, int partitionIndex) {
         this.cluster = cluster;
         this.fileSyncWriter = fileSyncWriter;
-        this.filePath = filePath;
         this.partitionIndex = partitionIndex;
     }
 
@@ -45,7 +41,7 @@ public class WordConsumer extends Thread {
                     isRun = Boolean.FALSE;
                 }
 
-                fileSyncWriter.putData(new FileData(message, getAbsoluteFileName(filePath, getFileName(message.getWord()))));
+                fileSyncWriter.putData(new FileData(message.getWord(), getFileName(message.getWord())));
                 System.out.println("Put Data" + message.getWord());
             }
 
@@ -59,15 +55,8 @@ public class WordConsumer extends Thread {
         char firstLetter = standardizedWord.charAt(0);
         if(Character.isAlphabetic(firstLetter)) {
             return String.valueOf(firstLetter);
-
         }
 
         return NUMBER_FILE_NAME;
     }
-
-
-    private String getAbsoluteFileName(String filePath, String fileName) {
-        return filePath + DIR_SEPARATOR + fileName + TXT_EXTENSION;
-    }
-
 }

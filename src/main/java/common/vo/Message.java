@@ -8,15 +8,13 @@ public class Message {
     private boolean eof;
     private String word;
 
-    public Message() { }
-
     public Message(String word) {
         this.eof = Boolean.FALSE;
         this.word = word;
     }
 
     public Message(boolean eof) {
-       this.eof = eof;
+        this.eof = eof;
     }
 
     public String getWord() { return word;}

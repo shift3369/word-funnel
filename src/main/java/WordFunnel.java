@@ -1,4 +1,4 @@
-import common.FileSyncWriter;
+import common.file.FileSyncWriter;
 import consumer.WordConsumer;
 import manager.MessageCluster;
 import producer.WordProducer;
@@ -18,23 +18,22 @@ public class WordFunnel {
         int partitionNumber = Integer.valueOf(args[2]);
 
         MessageCluster cluster = new MessageCluster(partitionNumber);
-        WordProducer producer = new WordProducer(cluster, filePath, inputFile);
+        WordProducer producer = new WordProducer(cluster, inputFile);
         producer.start();
 
         ExecutorService executorService = Executors.newFixedThreadPool(partitionNumber);
-        FileSyncWriter fileSyncWriter = new FileSyncWriter();
+        FileSyncWriter fileSyncWriter = new FileSyncWriter(filePath);
         fileSyncWriter.start();
 
-        for(int idx = 0; idx < partitionNumber; idx++) {
-            executorService.submit(new WordConsumer(cluster, fileSyncWriter, filePath, idx));
+        for (int idx = 0; idx < partitionNumber; idx++) {
+            executorService.submit(new WordConsumer(cluster, fileSyncWriter, idx));
         }
-
 
         try {
             producer.join();
             executorService.shutdown();
 
-            while(!executorService.awaitTermination(1, TimeUnit.MINUTES));
+            while (!executorService.awaitTermination(1, TimeUnit.MINUTES)) ;
 
             fileSyncWriter.close();
             fileSyncWriter.join();

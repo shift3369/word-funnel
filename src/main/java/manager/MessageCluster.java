@@ -29,7 +29,6 @@ public class MessageCluster {
         String value = message.getWord();
         int index = getDistributedPartitionIndex(value);
         partitions[index].add(message);
-        System.out.println(message.getWord() + " added to Partition[" + index +"]");
     }
 
     public void sendEof() {
@@ -46,13 +45,5 @@ public class MessageCluster {
         String standardizedInput = input.toLowerCase();
         int hashedInput = standardizedInput.hashCode();
         return hashedInput % partitionNumer;
-    }
-
-    private void printPartitionStauts() {
-        System.out.println("-----------------");
-        System.out.println(Thread.currentThread());
-        for(int idx = 0; idx < partitionNumer; idx++) {
-            System.out.println("PARTITION[" + idx + "] STATUS :" + partitions[idx].size());
-        }
     }
 }
