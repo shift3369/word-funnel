@@ -17,35 +17,25 @@ public class DuplicationValidator extends Validator {
 
     public DuplicationValidator() {}
 
-    public boolean isValid(String fileName, String value) {
-        List<String> histories = writeHistoryMap.get(fileName);
-
-        if (!histories.contains(value)) {
-            histories.add(value);
-            writeHistoryMap.put(fileName, histories);
-            return Boolean.TRUE;
-        }
-
-        return Boolean.FALSE;
-    }
-
     @Override
     public boolean isValid(Object o) {
+        System.out.println("Check dupe");
         FileData fileData = (FileData)o;
         String fileName = fileData.getFileName();
         String value = fileData.getValue();
+        String standardizedValue = value.toLowerCase();
         List<String> histories = writeHistoryMap.get(fileData.getFileName());
 
         if(histories != null) {
-            if(!histories.contains(value)) {
-                histories.add(value);
+            if(!histories.contains(standardizedValue)) {
+                histories.add(standardizedValue);
                 writeHistoryMap.put(fileName, histories);
             } else {
                 return Boolean.FALSE;
             }
         } else {
             histories = new ArrayList<>();
-            histories.add(value);
+            histories.add(standardizedValue);
             writeHistoryMap.put(fileName, histories);
         }
 

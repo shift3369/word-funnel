@@ -17,7 +17,7 @@ public class FileSyncWriter extends Thread {
     private static final String TXT_EXTENSION = ".txt";
     private static LinkedBlockingQueue<FileData> dataQueue = new LinkedBlockingQueue<>();
     private Validator duplicationValidator;
-    private static boolean isRun = Boolean.FALSE;
+    private boolean isRun = Boolean.FALSE;
     private String filePath;
 
     public FileSyncWriter(String filePath) {
@@ -41,25 +41,26 @@ public class FileSyncWriter extends Thread {
 
     private void write() {
         while (dataQueue.size() > 0 || isRun) {
-            try {
-                FileData data = dataQueue.take();
-                String value = data.getValue();
-                String fileName = data.getFileName();
-                System.out.println("File Write:" + value);
+            FileData data = dataQueue.poll(); //TODO take() 처리시 마지막 해제 고민해보기
 
-                if (duplicationValidator.isValid(data)) {
-                    try {
-                        FileWriter fileWriter = new FileWriter(getAbsoluteFileName(fileName), Boolean.TRUE);
-                        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                        bufferedWriter.append(value);
-                        bufferedWriter.close();
-                        fileWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            if(data == null) {
+                Thread.yield(); //Context Switching
+                continue;
+            }
+
+            String value = data.getValue() + "";
+            String fileName = data.getFileName();
+
+            if (duplicationValidator.isValid(data)) {
+                try {
+                    FileWriter fileWriter = new FileWriter(getAbsoluteFileName(fileName), Boolean.TRUE);
+                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                    bufferedWriter.append(value);
+                    bufferedWriter.flush();
+                    bufferedWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }

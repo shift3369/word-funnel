@@ -42,7 +42,7 @@ public class WordConsumer extends Thread {
                 }
 
                 fileSyncWriter.putData(new FileData(message.getWord(), getFileName(message.getWord())));
-                System.out.println("Put Data" + message.getWord());
+                System.out.println("Put Data: " + message.getWord());
             }
 
         } catch (InterruptedException e) {

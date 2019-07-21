@@ -31,13 +31,17 @@ public class WordFunnel {
 
         try {
             producer.join();
-            executorService.shutdown();
+            System.out.println("Producer join");
 
-            while (!executorService.awaitTermination(1, TimeUnit.MINUTES)) ;
+            executorService.shutdown();
+            System.out.println("Executor shutdown");
+            while (!executorService.awaitTermination(20, TimeUnit.MINUTES)) ;
 
             fileSyncWriter.close();
+            System.out.println("writer close");
             fileSyncWriter.join();
-
+            System.out.println("writer join");
+            System.out.println("FINISH WORD FUNNEL");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
