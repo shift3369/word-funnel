@@ -25,7 +25,7 @@ public class WordConsumer extends Thread {
     private static boolean isRun = Boolean.FALSE;
     private static final String NUMBER_FILE_NAME = "number";
     private static DuplicationValidator duplicationValidator = new DuplicationValidator();
-    private static Map<String, BufferedWriter> writerMap = new HashMap<>();
+    private Map<String, BufferedWriter> writerMap = new HashMap<>();
     private MessageBroker messageBroker;
     private String filePath;
     private int partitionIndex;
@@ -96,6 +96,7 @@ public class WordConsumer extends Thread {
             try {
                 writer.flush();
                 writer.close();
+                writerMap = new HashMap<>();
             } catch (IOException e) {
                 throw new WordFunnelException(WordFunnelException.ExceptionType.FILE_IO_EXCEPTION);
             }

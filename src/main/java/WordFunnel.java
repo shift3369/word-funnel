@@ -47,10 +47,10 @@ public class WordFunnel {
     }
 
     private static boolean isValidPartitionNumber(int partitionNumber) {
-        if (partitionNumber > 2 && partitionNumber < 28) {
+        if (partitionNumber > 1 && partitionNumber < 28) {
             return Boolean.TRUE;
         } else {
-            logger.info("파티션 수는 2보다 크거나 28 보다 작아야합니다.");
+            logger.info("파티션 수는 1보다 크거나 28 보다 작아야합니다.");
             return Boolean.FALSE;
         }
     }
