@@ -27,7 +27,13 @@ public class DuplicationValidator implements Validator {
         if(histories != null) {
             if(!histories.contains(standardizedValue)) {
                 histories.add(standardizedValue);
-                writeHistoryMap.put(fileName, histories);
+
+                char firstChar = standardizedValue.charAt(0);
+                if(Character.isDigit(firstChar)) {
+                    writeHistoryMap.put(String.valueOf(firstChar), histories);
+                } else {
+                    writeHistoryMap.put(fileName, histories);
+                }
             } else {
                 return Boolean.FALSE;
             }
