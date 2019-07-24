@@ -84,7 +84,6 @@ public class WordConsumer extends Thread {
                     writerMap.put(fileName, bufferedWriter);
                 }
                 bufferedWriter.append(word);
-                System.out.println(word);
             } catch (IOException e) {
                 throw new WordFunnelException(WordFunnelException.ExceptionType.FILE_IO_EXCEPTION);
             }
