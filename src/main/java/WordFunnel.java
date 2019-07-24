@@ -1,5 +1,6 @@
-import common.file.FileSyncWriter;
 import common.validate.WordValidator;
+import common.vo.WordFunnelException;
+import common.vo.WordFunnelException.ExceptionType;
 import consumer.WordConsumer;
 import manager.MessageBroker;
 import org.slf4j.Logger;
@@ -9,7 +10,6 @@ import producer.WordProducer;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Haylie
@@ -19,7 +19,6 @@ public class WordFunnel {
     private static final String REG_EXP = "^[a-zA-Z0-9]+$";
     private static WordProducer producer;
     private static ExecutorService consumerExecutorService;
-    private static FileSyncWriter fileSyncWriter;
     private static Logger logger = LoggerFactory.getLogger(WordFunnel.class);
 
     public static void main(String args[]) {
@@ -69,11 +68,9 @@ public class WordFunnel {
         producer = new WordProducer(messageBroker, new WordValidator(REG_EXP), inputFile);
         producer.start();
         consumerExecutorService = Executors.newFixedThreadPool(partitionNumber);
-        fileSyncWriter = new FileSyncWriter(filePath);
-        fileSyncWriter.start();
 
         for (int idx = 0; idx < partitionNumber; idx++) {
-            consumerExecutorService.submit(new WordConsumer(messageBroker, fileSyncWriter, idx));
+            consumerExecutorService.submit(new WordConsumer(messageBroker, filePath, idx));
         }
 
         logger.info("WordFunnel이 시작되었습니다.");
@@ -83,12 +80,9 @@ public class WordFunnel {
         try {
             producer.join();
             consumerExecutorService.shutdown();
-            while (!consumerExecutorService.awaitTermination(20, TimeUnit.MINUTES)) ;
-            fileSyncWriter.close();
-            fileSyncWriter.join();
             logger.info("리소스 정리가 완료되었습니다.");
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new WordFunnelException(ExceptionType.INTERRUPTED);
         }
     }
 }

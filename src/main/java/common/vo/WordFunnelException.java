@@ -15,6 +15,11 @@ public class WordFunnelException extends RuntimeException{
         super(message);
     }
 
+    public WordFunnelException(WordFunnelException.ExceptionType exceptionType) {
+        super();
+        this.exceptionType = exceptionType;
+    }
+
     public WordFunnelException(String message, WordFunnelException.ExceptionType exceptionType) {
         super(message);
         this.exceptionType = exceptionType;
@@ -22,6 +27,8 @@ public class WordFunnelException extends RuntimeException{
 
     public enum ExceptionType {
         FILE_NOT_FOUND,
-        PARTITION_ERROR
+        PARTITION_ERROR,
+        INTERRUPTED,
+        FILE_IO_EXCEPTION
     }
 }

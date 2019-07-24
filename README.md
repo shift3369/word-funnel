@@ -16,14 +16,12 @@ Program arguments에 다음과 같은 순서로 파라미터를 입력합니다.
 + WordProducer
     + 입력 파일에서 단어를 읽어 유효한 단어라면 MessageBroker에게 전달합니다.
 + WordConsumer
-    + MessageBroker에서 파티션을 assign 받아 해당 파티션의 메세지들을 소비하여 FileSyncWriter 대기열에 put 합니다.
+    + MessageBroker에서 파티션을 assign 받아 해당 파티션의 메세지들을 소비합니다.
+    + DuplicationValidator 를 아용하여 히스토리 검사 후 대상 파일에 write 합니다.
 + MessgeBroker
     + 입력한 수만큼의 파티션을 초기화 합니다.
     + producer가 생산한 메세지의 hash 값을 이용하여 파티션을 분배하여줍니다.
     + 컨슈머에게 파티션을 할당해줍니다.
-+ FileSyncWriter
-    + 큐에 쌓인 FileData 들을 소비하여 결과 파일에 write 합니다.
-    + DuplicationValidator 를 아용하여 히스토리 검사 후 write 합니다.
 + PartitionDistributor
     + 파티션 수와, 단어를 Standardize 하여 hash 값을 구한뒤 파티션 인덱스를 반환합니다.
 + WordValidator
