@@ -1,8 +1,9 @@
 package producer;
 
+import common.validate.Validator;
 import common.validate.WordValidator;
 import common.vo.Message;
-import manager.MessageBroker;
+import manager.MessageCluster;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.IOException;
  * @since 20/07/2019.
  */
 public class WordProducer extends Thread {
+    private Logger logger = LoggerFactory.getLogger(WordProducer.class);
     private static final String DIR_SEPARATOR = "/";
     private static final String CURRENT_DIR = ".";
     private String fileName;
@@ -34,9 +36,15 @@ public class WordProducer extends Thread {
     private void produce() {
         File inputFile = new File(getAbsoluteFileName(fileName));
 
+        if(!inputFile.exists()) {
+            logger.info("입력파일이 존재하지 않습니다.");
+            throw new RuntimeException();
+        }
+
         try (FileReader fileReader = new FileReader(inputFile);
              BufferedReader bufferedReader = new BufferedReader(fileReader)){ //try with resource
             String line;
+
             while ((line = bufferedReader.readLine()) != null) {
                 if(validator.isValid(line)) send(new Message(line));
             }

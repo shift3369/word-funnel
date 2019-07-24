@@ -1,9 +1,6 @@
 import common.file.FileSyncWriter;
-import common.validate.WordValidator;
 import consumer.WordConsumer;
-import manager.MessageBroker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import manager.MessageCluster;
 import producer.WordProducer;
 
 import java.util.concurrent.ExecutorService;
@@ -22,25 +19,32 @@ public class WordFunnel {
     private static Logger logger = LoggerFactory.getLogger(WordFunnel.class);
 
     public static void main(String args[]) {
-        if(isValidParameter(args)) {
+        if (isValidParameter(args)) {
             String inputFile = args[0];
             String filePath = args[1];
             int partitionNumber = Integer.valueOf(args[2]);
-            start(filePath, inputFile, partitionNumber);
-            finish();
+
+            if (isValidInputFile(inputFile) && isValidPartitionNumber(partitionNumber)) {
+                start(filePath, inputFile, partitionNumber);
+                finish();
+            }
         }
 
         logger.info("WordFunnel이 종료되었습니다.");
     }
 
-    private static boolean isValidParameter(String args[]) {
-        if(args.length != 3) {
-            logger.info("필요한 파라미터가 충족되지 않아 프로그램을 종료합니다.");
+    private static boolean isValidInputFile(String fileName) {
+        File inputFile = new File(fileName);
+        if (inputFile.exists()) {
+            return Boolean.TRUE;
+        } else {
+            logger.info("입력 파일이 존재하지 않습니다.");
             return Boolean.FALSE;
         }
+    }
 
-        int partitionNumber = Integer.valueOf(args[2]);
-        if(partitionNumber > 2 && partitionNumber < 28) {
+    private static boolean isValidPartitionNumber(int partitionNumber) {
+        if (partitionNumber > 2 && partitionNumber < 28) {
             return Boolean.TRUE;
         } else {
             logger.info("파티션 수는 2보다 크거나 28 보다 작아야합니다.");
@@ -48,7 +52,15 @@ public class WordFunnel {
         }
     }
 
-     private static void start(String filePath, String inputFile, int partitionNumber) {
+    private static boolean isValidParameter(String args[]) {
+        if (args.length != 3) {
+            logger.info("필요한 파라미터가 충족되지 않아 프로그램을 종료합니다.");
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
+
+    private static void start(String filePath, String inputFile, int partitionNumber) {
         MessageBroker messageBroker = new MessageBroker(partitionNumber);
         producer = new WordProducer(messageBroker, new WordValidator(REG_EXP), inputFile);
         producer.start();
@@ -67,8 +79,9 @@ public class WordFunnel {
         try {
             producer.join();
             consumerExecutorService.shutdown();
-            while (!consumerExecutorService.awaitTermination(20, TimeUnit.MINUTES));
+            while (!consumerExecutorService.awaitTermination(20, TimeUnit.MINUTES)) ;
             fileSyncWriter.close();
+            System.out.println("writer close");
             fileSyncWriter.join();
             logger.info("리소스 정리가 완료되었습니다.");
         } catch (InterruptedException e) {
