@@ -2,6 +2,7 @@ package producer;
 
 import common.validate.WordValidator;
 import common.vo.Message;
+import common.vo.WordFunnelException;
 import manager.MessageBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +38,17 @@ public class WordProducer extends Thread {
     private void produce() {
         File inputFile = new File(getAbsoluteFileName(fileName));
 
-        if(!inputFile.exists()) {
-            logger.info("입력파일이 존재하지 않습니다.");
-            throw new RuntimeException();
-        }
-
         try (FileReader fileReader = new FileReader(inputFile);
-             BufferedReader bufferedReader = new BufferedReader(fileReader)){ //try with resource
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) { //try with resource
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
-                if(validator.isValid(line)) send(new Message(line));
+                if (validator.isValid(line)) send(new Message(line));
             }
 
             messageBroker.sendEof();
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new WordFunnelException("입력파일이 존재하지 않습니다.", WordFunnelException.ExceptionType.FILE_NOT_FOUND);
         }
     }
 

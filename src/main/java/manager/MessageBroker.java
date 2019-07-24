@@ -3,6 +3,7 @@ package manager;
 import common.partition.PartitionDistributor;
 import common.vo.Message;
 import common.vo.WordFunnelException;
+import common.vo.WordFunnelException.ExceptionType;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -43,7 +44,7 @@ public class MessageBroker {
 
     public LinkedBlockingQueue<Message> assign(int partitionIndex) throws WordFunnelException {
         if (partitionIndex >= partitionNumber) {
-            throw new WordFunnelException();
+            throw new WordFunnelException("파티션의 index가 파티션 수보다 큽니다.", ExceptionType.PARTITION_ERROR);
         }
 
         return partitions[partitionIndex];
