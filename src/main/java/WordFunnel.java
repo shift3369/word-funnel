@@ -22,11 +22,10 @@ public class WordFunnel {
     private static Logger logger = LoggerFactory.getLogger(WordFunnel.class);
 
     public static void main(String args[]) {
-        String inputFile = args[0];
-        String filePath = args[1];
-        int partitionNumber = Integer.valueOf(args[2]);
-
         if(isValidParameter(args)) {
+            String inputFile = args[0];
+            String filePath = args[1];
+            int partitionNumber = Integer.valueOf(args[2]);
             start(filePath, inputFile, partitionNumber);
             finish();
         }
