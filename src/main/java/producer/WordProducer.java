@@ -1,9 +1,10 @@
 package producer;
 
-import common.validate.Validator;
 import common.validate.WordValidator;
 import common.vo.Message;
-import manager.MessageCluster;
+import manager.MessageBroker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
