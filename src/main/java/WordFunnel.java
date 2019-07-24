@@ -85,7 +85,6 @@ public class WordFunnel {
             consumerExecutorService.shutdown();
             while (!consumerExecutorService.awaitTermination(20, TimeUnit.MINUTES)) ;
             fileSyncWriter.close();
-            System.out.println("writer close");
             fileSyncWriter.join();
             logger.info("리소스 정리가 완료되었습니다.");
         } catch (InterruptedException e) {

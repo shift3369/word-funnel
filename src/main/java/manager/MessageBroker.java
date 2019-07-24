@@ -33,7 +33,11 @@ public class MessageBroker {
     public void accumulate(Message message) {
         String value = message.getWord();
         int index = partitionDistributor.getDistributedPartitionIndex(value, partitionNumber);
-        partitions[index].add(message);
+        try {
+            partitions[index].add(message);
+        } catch (Exception e) {
+            System.out.println("index:" + index + "/size:" + partitions[index].size());
+        }
     }
 
     public void sendEof() {

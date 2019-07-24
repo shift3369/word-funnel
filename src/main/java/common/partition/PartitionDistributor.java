@@ -9,7 +9,7 @@ public class PartitionDistributor {
     public int getDistributedPartitionIndex(String input, int partitionNumber) {
         String standardizedInput = input.toLowerCase();
         int hashedInput = standardizedInput.hashCode();
-        return hashedInput % partitionNumber;
+        return Math.abs(hashedInput) % partitionNumber;
     }
 
 }
