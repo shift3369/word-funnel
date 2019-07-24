@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * @author Haylie
  * @since 20/07/2019.
  */
-public class WordValidator extends Validator {
+public class WordValidator implements Validator<String> {
     private String regExp;
 
     public WordValidator(String regExp) {
@@ -15,10 +15,9 @@ public class WordValidator extends Validator {
     }
 
     @Override
-    public boolean isValid(Object o) {
-        String input = (String)o;
+    public boolean isValid(String s) {
         Pattern pattern = Pattern.compile(regExp);
-        Matcher matcher = pattern.matcher(input);
+        Matcher matcher = pattern.matcher(s);
         return matcher.find();
     }
 }

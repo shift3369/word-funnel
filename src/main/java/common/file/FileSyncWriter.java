@@ -1,9 +1,9 @@
 package common.file;
 
 import common.validate.DuplicationValidator;
-import common.validate.Validator;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,11 +13,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @since 21/07/2019.
  */
 public class FileSyncWriter extends Thread {
+    private static boolean isRun = Boolean.FALSE;
     private static final String DIR_SEPARATOR = "/";
     private static final String TXT_EXTENSION = ".txt";
     private static LinkedBlockingQueue<FileData> dataQueue = new LinkedBlockingQueue<>();
-    private Validator duplicationValidator;
-    private boolean isRun = Boolean.FALSE;
+    private DuplicationValidator duplicationValidator;
     private String filePath;
 
     public FileSyncWriter(String filePath) {
@@ -40,15 +40,18 @@ public class FileSyncWriter extends Thread {
     }
 
     private void write() {
-        while (dataQueue.size() > 0 || isRun) {
-            FileData data = dataQueue.poll(); //TODO take() 처리시 마지막 해제 고민해보기
+        File fileDir = new File(filePath);
+        fileDir.mkdirs();
 
-            if(data == null) {
+        while (dataQueue.size() > 0 || isRun) {
+            FileData data = dataQueue.poll();
+
+            if (data == null) {
                 Thread.yield(); //Context Switching
                 continue;
             }
 
-            String value = data.getValue() + "";
+            String value = data.getValue();
             String fileName = data.getFileName();
 
             if (duplicationValidator.isValid(data)) {
@@ -58,6 +61,7 @@ public class FileSyncWriter extends Thread {
                     bufferedWriter.append(value);
                     bufferedWriter.flush();
                     bufferedWriter.close();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

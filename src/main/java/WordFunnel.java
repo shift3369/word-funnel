@@ -1,6 +1,9 @@
 import common.file.FileSyncWriter;
+import common.validate.WordValidator;
 import consumer.WordConsumer;
-import manager.MessageCluster;
+import manager.MessageBroker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import producer.WordProducer;
 
 import java.util.concurrent.ExecutorService;
@@ -12,39 +15,65 @@ import java.util.concurrent.TimeUnit;
  * @since 20/07/2019.
  */
 public class WordFunnel {
+    private static final String REG_EXP = "^[a-zA-Z0-9]+$";
+    private static WordProducer producer;
+    private static ExecutorService consumerExecutorService;
+    private static FileSyncWriter fileSyncWriter;
+    private static Logger logger = LoggerFactory.getLogger(WordFunnel.class);
+
     public static void main(String args[]) {
-        String filePath = args[0];
-        String inputFile = args[1];
+        String inputFile = args[0];
+        String filePath = args[1];
         int partitionNumber = Integer.valueOf(args[2]);
 
-        MessageCluster cluster = new MessageCluster(partitionNumber);
-        WordProducer producer = new WordProducer(cluster, inputFile);
-        producer.start();
+        if(isValidParameter(args)) {
+            start(filePath, inputFile, partitionNumber);
+            finish();
+        }
 
-        ExecutorService executorService = Executors.newFixedThreadPool(partitionNumber);
-        FileSyncWriter fileSyncWriter = new FileSyncWriter(filePath);
+        logger.info("WordFunnel이 종료되었습니다.");
+    }
+
+    private static boolean isValidParameter(String args[]) {
+        if(args.length != 3) {
+            logger.info("필요한 파라미터가 충족되지 않아 프로그램을 종료합니다.");
+            return Boolean.FALSE;
+        }
+
+        int partitionNumber = Integer.valueOf(args[2]);
+        if(partitionNumber > 2 && partitionNumber < 28) {
+            return Boolean.TRUE;
+        } else {
+            logger.info("파티션 수는 2보다 크거나 28 보다 작아야합니다.");
+            return Boolean.FALSE;
+        }
+    }
+
+     private static void start(String filePath, String inputFile, int partitionNumber) {
+        MessageBroker messageBroker = new MessageBroker(partitionNumber);
+        producer = new WordProducer(messageBroker, new WordValidator(REG_EXP), inputFile);
+        producer.start();
+        consumerExecutorService = Executors.newFixedThreadPool(partitionNumber);
+        fileSyncWriter = new FileSyncWriter(filePath);
         fileSyncWriter.start();
 
         for (int idx = 0; idx < partitionNumber; idx++) {
-            executorService.submit(new WordConsumer(cluster, fileSyncWriter, idx));
+            consumerExecutorService.submit(new WordConsumer(messageBroker, fileSyncWriter, idx));
         }
 
+        logger.info("WordFunnel이 시작되었습니다.");
+    }
+
+    private static void finish() {
         try {
             producer.join();
-            System.out.println("Producer join");
-
-            executorService.shutdown();
-            System.out.println("Executor shutdown");
-            while (!executorService.awaitTermination(20, TimeUnit.MINUTES)) ;
-
+            consumerExecutorService.shutdown();
+            while (!consumerExecutorService.awaitTermination(20, TimeUnit.MINUTES));
             fileSyncWriter.close();
-            System.out.println("writer close");
             fileSyncWriter.join();
-            System.out.println("writer join");
-            System.out.println("FINISH WORD FUNNEL");
+            logger.info("리소스 정리가 완료되었습니다.");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }
