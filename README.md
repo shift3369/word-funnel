@@ -18,9 +18,9 @@ Program arguments에 다음과 같은 순서로 파라미터를 입력합니다.
 + WordConsumer
     + MessageBroker에서 파티션을 assign 받아 해당 파티션의 메세지들을 소비합니다.
     + DuplicationValidator 를 아용하여 히스토리 검사 후 대상 파일에 write 합니다.
-+ MessgeBroker
++ MessageBroker
     + 입력한 수만큼의 파티션을 초기화 합니다.
-    + producer가 생산한 메세지의 hash 값을 이용하여 파티션을 분배하여줍니다.
+    + producer 가 생산한 메세지의 hash 값을 이용하여 파티션을 분배하여줍니다.
     + 컨슈머에게 파티션을 할당해줍니다.
 + PartitionDistributor
     + 파티션 수와, 단어를 Standardize 하여 hash 값을 구한뒤 파티션 인덱스를 반환합니다.
@@ -32,9 +32,9 @@ Program arguments에 다음과 같은 순서로 파라미터를 입력합니다.
 
 ## TO DO
 + 현재는 파티션 수와 동일하게 consumer를 생성하였지만, consumer의 수를 사용자가 설정 가능하게 하고,
- MessageBroker에게 할당받을 수 있도록 해야한다. 이때 Arbitration, Starvation에 대한 정책을 마련해야 합니다.
-+ 현재 producer에서 파일의 끝을 읽은 경우 Eof에 대한 메세지를 보냄으로써, MessageBroker와 consumer에 대한 동작을 
-제어하지만 추후 리소스 managing 역하을 하는 클래스에 대한 고민이 필요합니다.
+ MessageBroker 에게 할당받을 수 있도록 해야한다. 이때 Arbitration, Starvation에 대한 정책을 마련해야 합니다.
++ 현재 producer 에서 파일의 끝을 읽은 경우 Eof에 대한 메세지를 보냄으로써, MessageBroker 와 consumer 에 대한 동작을 
+제어하지만 추후 리소스 managing 역힐을 하는 클래스에 대한 고민이 필요합니다.
 + 현재 단어의 write 히스토리를 메모리에서 가지고 있지만 추후 다른 저장소를 이용하여 히스토리 관리가 필요합니다.
  
 
