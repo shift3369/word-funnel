@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
  * @since 20/07/2019.
  */
 public class WordFunnel {
-    private static final String REG_EXP = "^[a-zA-Z0-9]+$";
+    private static final String REG_EXP = "^[a-zA-Z0-9]";
     private static WordProducer producer;
     private static ExecutorService consumerExecutorService;
     private static Logger logger = LoggerFactory.getLogger(WordFunnel.class);
