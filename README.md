@@ -27,7 +27,7 @@ Program arguments에 다음과 같은 순서로 파라미터를 입력합니다.
 + WordValidator
     + 정규식을 이용하여 파일에서 읽은 단어의 유효성을 검사합니다.
 + DuplicationValidator
-    + FileSyncWriter가 파일에 쓸때, 히스토리를 검색하고 저장한 후 유효성 체크 결과를 반환합니다.
+    + WordConsumer가 파일에 쓸때, 히스토리를 검색하고 저장한 후 유효성 체크 결과를 반환합니다.
 
 
 ## TO DO

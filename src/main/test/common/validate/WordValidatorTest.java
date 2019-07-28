@@ -8,7 +8,7 @@ import org.junit.Test;
  * @since 23/07/2019.
  */
 public class WordValidatorTest {
-    private WordValidator dut = new WordValidator("^[a-zA-Z0-9]+$");
+    private WordValidator dut = new WordValidator("^[a-zA-Z0-9]");
 
     @Test
     public void 만약_매칭되는_단어가_있으면_true를_반환한다() {
